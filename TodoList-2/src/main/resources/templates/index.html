@@ -1,0 +1,179 @@
+<!DOCTYPE html>
+<html lang="ko">
+
+<head>
+    <meta charset="UTF-8">
+    <meta http-equiv="X-UA-Compatible" content="IE=edge">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <link href="https://cdn.jsdelivr.net/npm/bootstrap@5.2.2/dist/css/bootstrap.min.css" rel="stylesheet"
+        integrity="sha384-Zenh87qX5JnK2Jl0vWa8Ck2rdkQ2Bzep5IDxbcnCeuOxjzrPF/et3URy9Bv1WTRi" crossorigin="anonymous">
+    <title>오늘 뭐하지?</title>
+    <style>
+        * {
+            margin: 0;
+            padding: 0;
+        }
+
+        .wrap {
+            border: 3px solid black;
+            background-color: #fff5e4;
+            margin: 0 auto;
+            width: 500px;
+            height: 700px;
+            position: relative;
+
+        }
+
+        .top {
+            width: 100%;
+            height: 100%;
+
+            text-align: center;
+            position: absolute;
+        }
+
+        .top2 {
+            position: absolute;
+            top: 35%;
+            left: 50%;
+            transform: translateX(-50%);
+            width: 500px;
+        }
+
+        .bottom {
+            position: relative;
+        }
+
+        .text1 {
+            top: 21%;
+            left: 50%;
+            transform: translate(-50%, -50%);
+            position: absolute;
+            font-size: 60px;
+            color: darkgray;
+            width: 500px;
+        }
+
+        .text2 {
+            top: 29%;
+            left: 50%;
+            transform: translate(-50%, -50%);
+            position: absolute;
+            font-size: 30px;
+            color: darkgray;
+            width: 500px;
+        }
+
+        .tablewrap {
+            border: 1px solid black;
+            width: 400px;
+            position: absolute;
+            top: 300px;
+            left: 50%;
+            transform: translateX(-50%);
+            text-align: center;
+        }
+
+        .page {
+            position: absolute;
+            bottom: -1%;
+            right: 50%;
+            transform: translateX(50%);
+        }
+
+        table {
+            border: 1px solid #444444;
+            text-align: center;
+        }
+
+        th,
+        td {
+            border: 1px solid #444444;
+        }
+
+        .complete {
+            text-decoration: line-through;
+        }
+    </style>
+</head>
+
+<body>
+    <div class="wrap">
+        <div class="top">
+            <div class="text1">ToDo-List</div>
+            <div class="text2">오늘의 할일</div>
+            <div class="top2">
+                <form th:action="@{|/Enter|}" th:object="${todoForm}" method="post">
+             <!--
+                <div class="alert alert-danger" role="alert" th:if="${#fields.hasAnyErrors()}">
+          			<div th:each="err : ${#fields.allErrors()}" th:text="${err}" />
+      	     	</div>
+      	     -->
+                    <textarea name="item" rows="1"></textarea>
+                    <input class="btn btn-primary btn-sm" type="submit" value="등록">
+                </form>
+            </div>
+        </div><!-- //top -->
+
+        <div class="bottom">
+            <table class="tablewrap">
+                <tr>
+                    <th>번호</th>
+                    <th>오늘할일</td>
+                    <th>상태</td>
+                    <th>다했나요?</td>
+                </tr>
+                <tr th:each="todo, loop : ${paging}">
+                    <td th:text="${loop.count}"></td>
+                    <!-- <td th:text="${todo.idx}"></td> -->
+                    <td th:text="${todo.item}"></td>
+                    <td th:text="${todo.status}"></td>
+                    <td>
+                        <button type="button" class="suc btn btn-danger btn-sm"
+                            th:onclick="deleteToDoList([[${todo.idx}]])">삭제</button>
+
+                        <button type="button" class="suc btn btn-success btn-sm"
+                            th:onclick="updateToDoList([[${todo.idx}]])">완료</button>
+                    </td>
+                </tr>
+            </table>
+        </div> <!-- //bottom -->
+        <!-- 페이징처리 시작 -->
+        <div class="page" th:if="${!paging.isEmpty()}">
+            <ul class="pagination justify-content-center">
+                <li class="page-item" th:classappend="${!paging.hasPrevious} ? 'disabled'">
+                    <a class="page-link" th:href="@{|?page=${paging.number-1}|}">
+                        <span>이전</span>
+                    </a>
+                </li>
+                <li th:each="page: ${#numbers.sequence(0, paging.totalPages-1)}"
+                th:classappend="${page == paging.number} ? 'active'" 
+                class="page-item">
+                <a th:text="${page}" class="page-link" th:href="@{|?page=${page}|}"></a>
+            </li>
+            <li class="page-item" th:classappend="${!paging.hasNext} ? 'disabled'">
+                <a class="page-link" th:href="@{|?page=${paging.number+1}|}">
+                    <span>다음</span>
+                </a>
+            </li>
+        </ul>
+    </div>
+    <!-- 페이징처리 끝 -->
+    </div> <!-- //wrap -->
+    <script th:inline="javascript">
+    
+    function deleteToDoList(idx) {
+		
+            if (confirm("삭제하시겠습니까?")) {
+				location.href= 'index/' + idx;
+
+        }
+    }
+        function updateToDoList(idx) {
+            if (confirm("할 일을 다 하셨나요?")) {	
+                location.href= 'update/' + idx;
+            }
+        }
+    </script>
+</body>
+</html>
